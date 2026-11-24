@@ -14,14 +14,14 @@ outreach emails, one at a time, **only after your explicit approval and a final 
 
 ## 1. One-time setup (Windows, VS Code)
 
-You need **Python 3.11+**. (Python 3.12 was installed for this project with
-`winget install Python.Python.3.12`.)
+You need **Python 3.11+**. This project's `.venv` and the Docker image use Python 3.14
+(`winget install Python.Python.3.14`).
 
 Open this folder in VS Code, then open a terminal (**Terminal → New Terminal**) and run:
 
 ```powershell
 # 1. create a virtual environment (an isolated place for this project's packages)
-& "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe" -m venv .venv
+py -3.14 -m venv .venv
 
 # 2. activate it (your prompt will start with (.venv))
 .\.venv\Scripts\Activate.ps1
@@ -51,8 +51,12 @@ uvicorn app.main:app --reload --port 8000
 ```
 
 Open **http://127.0.0.1:8000** in your browser. Press `Ctrl+C` in the terminal to stop it.
+Or double-click **Start Outreach App.bat** (runs it in the background and opens the browser) and
+**Stop Outreach App.bat** to stop it.
 
-The app only listens on your own computer (127.0.0.1). Don't expose it to the internet: it has no login.
+Locally, the app only listens on your own computer (127.0.0.1) and needs no password. Set
+`APP_PASSWORD` in `.env` to turn on the login page. On a server a password is required: without
+`APP_PASSWORD` the hosted app refuses every request. To host it on Render, see [DEPLOY.md](DEPLOY.md).
 
 ## 3. Daily workflow
 
@@ -65,7 +69,7 @@ The app only listens on your own computer (127.0.0.1). Don't expose it to the in
 | 5 | **Review & approve** | Preview, edit, approve, reject or delete. Editing an approved draft removes its approval. |
 | 6 | **Sending queue** | Select approved drafts → **Prepare batch** → check the confirmation screen (count, recipients, subjects, full messages) → type `SEND` → start. **Cancel sending** stops anything not yet sent. |
 | 7 | **Sent history** | Every attempt with timestamp, recipient, subject, provider response and result. |
-| 8 | **Follow-ups** | Optional and off by default. One per email, each needs its own approval. |
+| 8 | **Follow-ups & replies** | Follow-ups are optional and off by default. One per email, each needs its own approval. With Gmail connected, the app also detects replies and bounces (bell icon): a reply marks the contact *Replied* and cancels its follow-up, a bounce marks it *Bounced*. Nothing in Gmail is sent, deleted or changed. |
 
 ### Contact file columns
 
@@ -109,7 +113,13 @@ database, or the sending worker are called directly.
 
 ## 6. Gmail API setup (OAuth 2.0)
 
-The app asks only for the `gmail.send` permission. It can send mail as you but can't read your inbox.
+The app asks for two permissions: `gmail.send` (to send your approved emails) and `gmail.readonly`
+(to detect replies and bounces to emails it sent). It never deletes, changes or sends anything on its
+own. Older tokens that only have `gmail.send` still work for sending; reply detection then stays off
+until you click **Reconnect Gmail**.
+
+This section is for running the app on your computer (**Desktop app** client). For the hosted app,
+DEPLOY.md uses a **Web application** client instead.
 
 1. Go to <https://console.cloud.google.com/> and create a project (e.g. "Outreach").
 2. **APIs & Services → Library** → search **Gmail API** → **Enable**.
@@ -243,8 +253,10 @@ CAPTCHAs, logins or rate limits. A free *automatic* option is your own SearXNG s
 (`SEARCH_PROVIDER=searxng`). A paid provider without a key falls back to the free workflow; nothing ever
 switches to a paid service on its own.
 
-**DA / DR** stay **Not Checked** unless you configure a provider below. Each website's *Details* links to
-the free Ahrefs and Moz checkers so you can look a site up yourself. **Email status** stays **Not
+**DA / DR** stay **Not Checked** unless a real provider supplied them: an API key below, Claude
+auto-discovery (free Ahrefs DR lookup), or values you import with
+`python -m app.discovery import-metrics FILE.json --metric dr --source "..."` (JSON `{domain: value}`).
+Each website's *Details* links to the free Ahrefs and Moz checkers so you can look a site up yourself. **Email status** stays **Not
 Checked** unless a verification service is configured.
 
 ### API keys (all optional, set in `.env`)
@@ -332,6 +344,10 @@ recording, rejection, edit-after-approval, unauthorized-sending attempts, batch 
 definite/uncertain/auth/rate-limit failures, crash recovery, test and dry-run modes, suppression,
 opt-out and follow-up cancellation.
 
+Other test files cover free discovery (`test_free_discovery.py`), Claude auto-discovery
+(`test_claude_agent.py`), reply and bounce detection (`test_replies.py`) and the hosted login
+(`test_hosting.py`).
+
 `tests/test_discovery.py` (all network traffic mocked) covers search providers and errors, domain
 normalization, qualification of relevant, spam, irrelevant, closed and robots-blocked sites, duplicate
 detection, DA/DR parsing, validation and caching, email-verification statuses, CSV column order,
@@ -364,6 +380,10 @@ app/
   websites.py     discovered websites, filters, link to contacts
   csv_sync.py     niche_websites_outreach.csv export and merge
   domains.py      URL and domain normalization
+  free_discovery.py  free search-query generator and URL import queue
+  claude_agent.py Claude auto-discovery (runs `claude -p`)
+  replies.py      reply, bounce and follow-up-due alerts
+  auth.py         login page for the hosted app
 static/           dashboard (index.html, app.css, app.js)
 scripts/          optional Windows Task Scheduler setup
 output/           niche_websites_outreach.csv (git-ignored)
@@ -372,6 +392,8 @@ tests/            automated tests
 sample_data/      example contact file (fictional example.com addresses)
 data/             your database (created automatically, git-ignored)
 credentials/      Gmail OAuth files (you create it, git-ignored)
+Dockerfile, render.yaml, DEPLOY.md   hosting on Render
+Start/Stop Outreach App.bat          start or stop the app with a double-click
 ```
 
 ## 10. Troubleshooting
@@ -389,7 +411,7 @@ credentials/      Gmail OAuth files (you create it, git-ignored)
 | Email shows **uncertain** | Check your Gmail **Sent** folder, then resolve it in **Sent history**. |
 | Draft won't go into a batch | The confirmation dialog lists the reason (not approved, edited, unverified, suppressed, already contacted…). |
 | Import says "Could not find an email column" | Add a header such as `Email` to the first row. |
-| Discovery finds nothing new | Check **Services and limits** on the Website discovery page. Without a search key it can't search. Results for a query are reused for 14 days. |
+| Discovery finds nothing new | Check **Services and limits** on the Website discovery page. Without a search key, automatic search is off: use the free workflow (generate searches, import URLs) or **Find new websites with Claude**. Results for a query are reused for 14 days. |
 | "Discovery already completed today" | That's the once-a-day rule. Click **Run Website Discovery Now** to run again. |
 | A site is *Needs Review*: "refused automated access" / robots.txt | The site doesn't allow automated visits. Check it by hand in your browser. |
 | DA or DR blank | The key isn't set, the quota is used up, or the provider returned no value. See *DA Source* / *DR Source* and the run's warnings. |
