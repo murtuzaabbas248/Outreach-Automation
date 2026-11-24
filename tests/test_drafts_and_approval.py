@@ -24,7 +24,7 @@ def test_draft_generation_content(client, provider):
     assert d["approval_status"] == "pending" and d["send_status"] == "not_sent"
     body = d["body"]
     assert body.startswith("Hi Editor,")
-    assert "Zehra Zaidi" in body
+    assert "Test Sender" in body
     assert "guidelines" in body or "guest" in body.lower()
     assert "won't contact you again" in body          # opt-out line
     assert d["subject"]

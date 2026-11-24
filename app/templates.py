@@ -96,7 +96,8 @@ def greeting(contact: dict) -> str:
 
 
 def signature(settings: dict) -> str:
-    lines = ["Best regards,", settings.get("sender_name") or "Zehra Zaidi", "Content Writer & Researcher"]
+    lines = ["Best regards,", *([settings["sender_name"]] if settings.get("sender_name") else []),
+             "Content Writer & Researcher"]
     for key in ("sender_email", "sender_website", "sender_postal_address"):
         if key == "sender_email" and sender_email_problem(settings.get(key, "")):
             continue  # never print a missing or placeholder address; callers warn instead

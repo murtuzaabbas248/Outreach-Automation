@@ -95,7 +95,7 @@ def previous_queries(limit: int = 60) -> list[str]:
 
 def build_prompt(niches: list[str], per_niche: int) -> str:
     labels = ", ".join(f"{k} ({NICHE_LABELS[k]})" for k in niches)
-    return f"""You are helping a content writer, Zehra Zaidi, find websites that accept guest posts.
+    return f"""You are helping a content writer find websites that accept guest posts.
 Niches (use these exact keys in your answer): {labels}.
 Goal: about {per_niche} NEW publisher websites per niche, each with its own page inviting guest posts or contributors.
 

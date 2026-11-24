@@ -60,11 +60,12 @@ DEFAULTS = {
     "provider": _env("EMAIL_PROVIDER", "dryrun"),  # dryrun | gmail | smtp
     "test_mode": _env("TEST_MODE", "true"),
     "test_recipient": _env("TEST_RECIPIENT"),
-    "sender_name": _env("SENDER_NAME", "Zehra Zaidi"),
+    "sender_name": _env("SENDER_NAME"),
     "sender_email": _env("SENDER_EMAIL"),
     "sender_description": _env(
         "SENDER_DESCRIPTION",
-        "I am Zehra Zaidi, a content writer and researcher specializing in education, technology, and business services.",
+        (f"I am {_env('SENDER_NAME')}, a" if _env("SENDER_NAME") else "I am a")
+        + " content writer and researcher specializing in education, technology, and business services.",
     ),
     "sender_website": _env("SENDER_WEBSITE"),
     "sender_postal_address": _env("SENDER_POSTAL_ADDRESS"),
@@ -127,7 +128,7 @@ CLAUDE_DISCOVERY_MAX_TURNS = _env_int("CLAUDE_DISCOVERY_MAX_TURNS", 40)
 CLAUDE_DISCOVERY_TIMEOUT_SECONDS = _env_int("CLAUDE_DISCOVERY_TIMEOUT_SECONDS", 1500)
 CRAWLER_USER_AGENT = _env(
     "CRAWLER_USER_AGENT",
-    "ZehraOutreachResearchBot/1.0 (+contributor research; respects robots.txt)",
+    "OutreachResearchBot/1.0 (+contributor research; respects robots.txt)",
 )
 
 

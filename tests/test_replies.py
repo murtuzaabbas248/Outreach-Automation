@@ -69,7 +69,7 @@ def test_reply_in_thread_marks_replied_and_cancels_follow_up(sent, provider):
     fake, rows = sent
     first = rows[0]
     tid = fake.thread_of(first["provider_message_id"])
-    fake.threads[tid] = [msg(first["provider_message_id"], "zehra@example.org", date="2000-01-01T00:00:00+00:00"),
+    fake.threads[tid] = [msg(first["provider_message_id"], "sender@example.org", date="2000-01-01T00:00:00+00:00"),
                          msg("m-reply", first["to_email"])]
     r = replies.check("manual")
     assert r["checked"] and r["replies"] == 1 and r["bounces"] == 0
@@ -94,7 +94,7 @@ def test_bounce_marks_bounced(sent):
 def test_own_and_older_messages_are_not_replies(sent):
     fake, rows = sent
     tid = fake.thread_of(rows[0]["provider_message_id"])
-    fake.threads[tid] = [msg("m-own", "zehra@example.org"), msg("m-old", rows[0]["to_email"], date="2000-01-01T00:00:00+00:00")]
+    fake.threads[tid] = [msg("m-own", "sender@example.org"), msg("m-old", rows[0]["to_email"], date="2000-01-01T00:00:00+00:00")]
     assert replies.check()["replies"] == 0 and alerts() == []
     assert contact_status(rows[0]["to_email"]) == "contacted"
 
@@ -209,16 +209,16 @@ def b64(s):
 
 def test_message_text_prefers_plain_then_html():
     plain = {"mimeType": "multipart/alternative", "parts": [
-        {"mimeType": "text/plain", "body": {"data": b64("Hi Zehra,\nYes please send it.")}},
+        {"mimeType": "text/plain", "body": {"data": b64("Hi Sam,\nYes please send it.")}},
         {"mimeType": "text/html", "body": {"data": b64("<p>ignored</p>")}}]}
-    assert replies.message_text(plain) == "Hi Zehra,\nYes please send it."
+    assert replies.message_text(plain) == "Hi Sam,\nYes please send it."
     html = {"mimeType": "text/html", "body": {"data": b64("<p>Our fee is <b>$50</b>.</p><script>x()</script>")}}
     assert "Our fee is" in replies.message_text(html) and "x()" not in replies.message_text(html)
 
 
 def test_strip_quoted_keeps_only_their_new_words():
     text = ("Sounds great, send the draft by Friday.\n\nThanks,\nAmy\n\n"
-            "On Mon, Nov 23, 2026 at 5:12 PM Zehra Zaidi <zehra@example.org>\nwrote:\n> Hi Amy,\n> I'd like to pitch...")
+            "On Mon, Nov 23, 2026 at 5:12 PM Test Sender <sender@example.org>\nwrote:\n> Hi Amy,\n> I'd like to pitch...")
     assert replies.strip_quoted(text) == "Sounds great, send the draft by Friday.\n\nThanks,\nAmy"
     assert replies.strip_quoted("> only quoted") == "> only quoted"  # never returns empty
 

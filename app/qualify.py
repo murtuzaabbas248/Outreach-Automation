@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from .domains import clean_url, root_domain
 from .validation import is_valid_email, normalize_email
 
-# The four niches Zehra writes for. Labels are what's stored and exported.
+# The four niches the sender writes for. Labels are what's stored and exported.
 NICHE_LABELS = {
     "education": "Education",
     "technology": "Technology",

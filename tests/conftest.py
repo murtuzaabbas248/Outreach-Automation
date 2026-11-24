@@ -43,7 +43,7 @@ def client(tmp_path, provider):
     sender.SYNC = True
     with TestClient(app) as c:
         set_settings(provider="gmail", test_mode="false", send_delay_seconds="0", daily_send_limit="100",
-                     sender_email="zehra@example.org", test_recipient="me@example.org")
+                     sender_name="Test Sender", sender_email="sender@example.org", test_recipient="me@example.org")
         yield c
     sender.SYNC = False
 

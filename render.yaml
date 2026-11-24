@@ -25,6 +25,8 @@ services:
         sync: false
       - key: SENDER_EMAIL
         sync: false
+      - key: SENDER_NAME           # your name in the email signature
+        sync: false
       # ---- optional ----
       - key: TEST_RECIPIENT
         sync: false
