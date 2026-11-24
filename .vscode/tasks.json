@@ -1,0 +1,47 @@
+{
+  // Tasks for the outreach project. Run any of them from Terminal > Run Task...
+  // "Website discovery (once per day)" runs automatically when this folder is opened,
+  // after you allow it once: Ctrl+Shift+P > "Tasks: Manage Automatic Tasks" > "Allow Automatic Tasks".
+  // It skips itself if discovery already completed today. It never sends email.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Website discovery (once per day)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "app.discovery", "run", "--if-not-run-today", "--trigger", "vscode"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "reveal": "silent", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Website Discovery Now",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "app.discovery", "run"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start outreach dashboard",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "uvicorn", "app.main:app", "--port", "8000"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run tests",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "pytest", "-q"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

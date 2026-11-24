@@ -1,0 +1,16 @@
+fastapi==0.159.1
+uvicorn[standard]==0.54.0
+python-multipart==0.0.32
+openpyxl==3.1.5
+email-validator==2.3.0
+python-dotenv==1.2.4
+google-api-python-client==2.201.0
+google-auth==2.62.0
+google-auth-oauthlib==1.5.0
+
+# website discovery (HTTP client + HTML parsing)
+httpx==0.28.1
+beautifulsoup4==4.15.0
+
+# testing
+pytest==9.1.1

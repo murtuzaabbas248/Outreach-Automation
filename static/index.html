@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Outreach Dashboard</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu">&#9776;</button>
+    <div class="brand">Guest Post Outreach</div>
+    <a href="#followups" id="bell" class="bell" aria-label="Alerts" title="Replies, bounces and follow-ups due">&#128276;<span id="bellCount" class="bell-count hidden"></span></a>
+    <div id="modeBadge" class="mode-badge"></div>
+  </header>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="brand side-brand">Guest Post Outreach</div>
+    <a href="#overview" data-page="overview">Dashboard</a>
+    <a href="#discovery" data-page="discovery">Website discovery</a>
+    <a href="#import" data-page="import">Import contacts</a>
+    <a href="#contacts" data-page="contacts">Manage contacts</a>
+    <a href="#topics" data-page="topics">Guest post topics</a>
+    <a href="#generate" data-page="generate">Generate drafts</a>
+    <a href="#review" data-page="review">Review &amp; approve</a>
+    <a href="#queue" data-page="queue">Sending queue</a>
+    <a href="#history" data-page="history">Sent history</a>
+    <a href="#followups" data-page="followups">Follow-ups &amp; replies <span id="navAlertCount" class="nav-count hidden"></span></a>
+    <a href="#settings" data-page="settings">Settings</a>
+    <a href="/logout" id="logoutLink" class="hidden">Sign out</a>
+  </nav>
+
+  <a href="#followups" id="bellDesk" class="bell bell-desk" aria-label="Alerts" title="Replies, bounces and follow-ups due">&#128276;<span class="bell-count hidden"></span></a>
+  <main id="main" class="main"></main>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="modalTitle"></h3>
+        <button class="icon-btn" id="modalClose" aria-label="Close">&times;</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

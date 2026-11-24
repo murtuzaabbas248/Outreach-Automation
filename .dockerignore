@@ -1,0 +1,17 @@
+# Never put secrets or personal data into the image.
+.env
+credentials/
+data/
+output/
+backups/
+*.db
+.venv/
+.venv_py312_backup/
+__pycache__/
+*.pyc
+.pytest_cache/
+.vscode/
+tests/
+scripts/
+sample_data/
+*.bat

@@ -1,0 +1,25 @@
+# secrets
+.env
+credentials/
+client_secret*.json
+*token*.json
+
+# local data (the CSV export contains contact details)
+data/
+output/
+backups/
+*.db
+*.db-journal
+
+# python
+.venv/
+.venv_py312_backup/
+.claude/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# editors / OS
+.vscode/settings.json
+.DS_Store
+Thumbs.db

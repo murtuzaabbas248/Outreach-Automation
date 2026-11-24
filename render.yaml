@@ -1,0 +1,40 @@
+# Render Blueprint: New > Blueprint > pick this repository.
+# Values marked "sync: false" are asked for when you create the service (they're secrets; never commit them).
+services:
+  - type: web
+    name: outreach-dashboard
+    runtime: docker
+    plan: starter            # a paid instance is needed for the persistent disk
+    region: singapore        # change to the region closest to you (oregon, ohio, virginia, frankfurt, singapore)
+    numInstances: 1          # one instance only: SQLite on a disk
+    healthCheckPath: /healthz
+    autoDeploy: true
+    disk:
+      name: outreach-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      # ---- required ----
+      - key: APP_PASSWORD          # the password for the login page; use a long one
+        sync: false
+      - key: SESSION_SECRET        # signs the login cookie
+        generateValue: true
+      - key: PUBLIC_BASE_URL       # e.g. https://outreach-dashboard.onrender.com (no trailing slash)
+        sync: false
+      - key: GMAIL_CLIENT_SECRET_JSON  # paste the whole Google "Web application" OAuth client JSON
+        sync: false
+      - key: SENDER_EMAIL
+        sync: false
+      # ---- optional ----
+      - key: TEST_RECIPIENT
+        sync: false
+      - key: CLAUDE_CODE_OAUTH_TOKEN   # from `claude setup-token`; enables "Find new websites with Claude"
+        sync: false
+      - key: EMAIL_PROVIDER
+        value: dryrun                # safe default for a brand-new database; a restored backup keeps your own setting
+      - key: TEST_MODE
+        value: "true"
+      - key: SEARCH_PROVIDER
+        value: manual
+      - key: DISCOVERY_AUTO_ON_STARTUP
+        value: "false"
