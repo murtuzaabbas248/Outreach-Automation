@@ -56,16 +56,17 @@ SMTP_USE_SSL = _env("SMTP_USE_SSL", "false").lower() in ("1", "true", "yes")
 SMTP_TIMEOUT = _env_int("SMTP_TIMEOUT", 30)
 
 # Defaults for settings that can later be changed in the dashboard.
+_SENDER_NAME = _env("SENDER_NAME")
 DEFAULTS = {
     "provider": _env("EMAIL_PROVIDER", "dryrun"),  # dryrun | gmail | smtp
     "test_mode": _env("TEST_MODE", "true"),
     "test_recipient": _env("TEST_RECIPIENT"),
-    "sender_name": _env("SENDER_NAME"),
+    "sender_name": _SENDER_NAME,
     "sender_email": _env("SENDER_EMAIL"),
     "sender_description": _env(
         "SENDER_DESCRIPTION",
-        (f"I am {_env('SENDER_NAME')}, a" if _env("SENDER_NAME") else "I am a")
-        + " content writer and researcher specializing in education, technology, and business services.",
+        f"I am {_SENDER_NAME + ', a' if _SENDER_NAME else 'a'} content writer and researcher"
+        " specializing in education, technology, and business services.",
     ),
     "sender_website": _env("SENDER_WEBSITE"),
     "sender_postal_address": _env("SENDER_POSTAL_ADDRESS"),
