@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import (auth, claude_agent, config, contacts, csv_sync, db, discovery, drafts, free_discovery, gmail_auth, replies, sender,
-               websites)
+               seo_metrics, websites)
 from .importer import VALID_STATUSES, import_contacts
 from .topics import NICHES
 from .validation import is_valid_email
@@ -591,6 +591,24 @@ async def discovery_import_file(file: UploadFile = File(...), niche: str = Form(
         raise HTTPException(400, "File is larger than 5 MB.")
     text = content.decode("utf-8-sig", errors="replace")
     return _after_import(free_discovery.import_urls(text, niche, query, f"file:{name}"), process)
+
+
+class MetricsIn(BaseModel):
+    metric: str
+    source: str = Field(min_length=1, max_length=200)
+    values: dict[str, float | int | str | None] = Field(max_length=5000)
+
+
+@app.post("/api/discovery/import-metrics")
+def discovery_import_metrics(body: MetricsIn):
+    """Store DA/DR values from a real provider (same rules as `python -m app.discovery import-metrics`):
+    only 0..100 numbers for websites already in the database; nothing is estimated."""
+    try:
+        r = seo_metrics.import_values(body.values, body.metric, body.source)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    csv_sync.export()
+    return r
 
 
 class ClaudeDiscoverIn(BaseModel):

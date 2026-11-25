@@ -306,6 +306,18 @@ def test_imported_metrics_accept_only_real_values_for_known_sites(free):
         seo_metrics.import_values({"biosecure-blog.com": 1}, "dr", " ")
 
 
+def test_import_metrics_api_stores_values_and_rejects_bad_metric(free, client):
+    free_discovery.import_urls(PASTE)
+    run()
+    src = "Domain Rating by Ahrefs (free lookup)"
+    r = client.post("/api/discovery/import-metrics", json={"metric": "dr", "source": src,
+                                                          "values": {"biosecure-blog.com": 61, "never-seen.com": 40}}).json()
+    assert r["updated"] == 1 and r["not_in_database"] == ["never-seen.com"]
+    assert by_domain()["biosecure-blog.com"]["dr"] == 61.0
+    assert client.post("/api/discovery/import-metrics",
+                       json={"metric": "pagerank", "source": src, "values": {"biosecure-blog.com": 1}}).status_code == 400
+
+
 def test_run_button_explains_empty_queue_in_free_mode(free, client, monkeypatch):
     started = []
     monkeypatch.setattr(discovery, "run_in_background", lambda trigger, force: started.append(trigger)
